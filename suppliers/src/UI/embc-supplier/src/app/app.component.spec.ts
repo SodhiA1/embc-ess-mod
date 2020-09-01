@@ -1,24 +1,40 @@
-import { TestBed, async } from '@angular/core/testing';
+import { TestBed, async, inject } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SupplierHttpService } from './service/supplierHttp.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { LayoutModule } from './layout/layout.module';
+import { SupplierSubmissionComponent } from './supplierSubmission/supplierSubmission.component';
+import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 describe('AppComponent', () => {
+  let supplierService: SupplierHttpService;
   beforeEach(async(() => {
+    // routerStub = {
+    //   navigate: jasmine.createSpy('navigate'),
+    // };
     TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule,
+        RouterTestingModule.withRoutes([
+          { path: 'submission', component: SupplierSubmissionComponent }
+        ]),
         HttpClientTestingModule,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        LayoutModule
       ],
       declarations: [
-        AppComponent
+        AppComponent,
+        SupplierSubmissionComponent
       ],
-      providers: [SupplierHttpService]
-    }).compileComponents();
+      providers: [SupplierHttpService,
+        //{provide: Router, useValue: routerStub }
+      ]
+    }).compileComponents().then(() => {
+      supplierService = TestBed.inject(SupplierHttpService);
+    });
   }));
 
   it('should create the app', () => {
@@ -28,33 +44,36 @@ describe('AppComponent', () => {
   });
 
   it(`should be created`, () => {
-    const service: SupplierHttpService = TestBed.inject(SupplierHttpService);
-    expect(service).toBeTruthy();
+    expect(supplierService).toBeTruthy();
   });
 
   it('should have getListOfCities function', () => {
-    const service: SupplierHttpService = TestBed.inject(SupplierHttpService);
-    expect(service.getListOfCities).toBeTruthy();
-   });
+    expect(supplierService.getListOfCities).toBeTruthy();
+  });
 
   it('should have getListOfProvinces function', () => {
-    const service: SupplierHttpService = TestBed.inject(SupplierHttpService);
-    expect(service.getListOfProvinces).toBeTruthy();
-   });
+    expect(supplierService.getListOfProvinces).toBeTruthy();
+  });
 
   it('should have getListOfStates function', () => {
-    const service: SupplierHttpService = TestBed.inject(SupplierHttpService);
-    expect(service.getListOfStates).toBeTruthy();
-   });
+    expect(supplierService.getListOfStates).toBeTruthy();
+  });
 
   it('should have getListOfCountries function', () => {
-    const service: SupplierHttpService = TestBed.inject(SupplierHttpService);
-    expect(service.getListOfCountries).toBeTruthy();
-   });
+    expect(supplierService.getListOfCountries).toBeTruthy();
+  });
 
   it('should have getListOfSupportItems function', () => {
-    const service: SupplierHttpService = TestBed.inject(SupplierHttpService);
-    expect(service.getListOfSupportItems).toBeTruthy();
-   });
+    expect(supplierService.getListOfSupportItems).toBeTruthy();
+  });
 
+  it('should go to submission path',
+    async(inject([Router, Location], (router: Router, location: Location) => {
+      let fixture = TestBed.createComponent(SupplierSubmissionComponent);
+      fixture.detectChanges();
+      router.navigate(['/submission']).then(() => {
+        expect(location.path()).toBe('/submission')
+      });
+
+    })));
 });
